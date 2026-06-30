@@ -13,3 +13,62 @@
  *
  * https://refactoring.guru/es/design-patterns/observer
  */
+import {COLORS} from "../helpers/colors.ts";
+
+interface Observer {
+  notify(videoTitle: string): void;
+}
+
+class YoutubeChannel {
+  private subscribers: Observer[] = [];
+  private name: string;
+  constructor(name: string) {
+    this.name = name;
+  }
+  subscribe(observer: Observer) {
+    this.subscribers.push(observer);
+    console.log(`Nuevo suscriptor al canal %c${this.name}`,COLORS.green)
+  }
+
+  unsubscribe(observer: Observer) {
+    this.subscribers = this.subscribers.filter(sub => sub !== observer);
+    console.log(`Un suscriptor se ha dado de baja ${this.name}`)
+  }
+
+  uploadVideo(videoTitle: string) {
+    console.log(`Canal ${this.name} ha subido un nuevo video: ${videoTitle}`, COLORS.green);
+    for (const subscriber of this.subscribers) {
+      subscriber.notify(videoTitle);
+    }
+  }
+}
+
+class Subscriber  implements Observer {
+  private name: string;
+  constructor(name: string) {
+    this.name = name;
+  }
+  notify(videoTitle: string) {
+    console.log(`%c[${this.name}] %cNuevo video disponible: %c${videoTitle}`, COLORS.blue, COLORS.yellow, COLORS.white);
+  }
+}
+
+function main() {
+  const channel = new YoutubeChannel('Cocinando con Sergio');
+  const pedro = new Subscriber('pedro');
+  const cesar = new Subscriber('cesar');
+  const emilio = new Subscriber('emilio');
+  channel.subscribe(pedro);
+  channel.subscribe(cesar);
+
+  channel.uploadVideo('Como hacer pastel de chocolate');
+  channel.subscribe(emilio);
+  channel.uploadVideo('Como hacer pastel de naranja');
+  channel.unsubscribe(cesar);
+  channel.uploadVideo('Como hacer pastel de sandia');
+  channel.unsubscribe(pedro);
+  channel.uploadVideo('Como hacer pastel de limón');
+  channel.unsubscribe(emilio);
+  console.log('\n\n');
+}
+main();

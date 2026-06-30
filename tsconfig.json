@@ -1,0 +1,7 @@
+{
+  "compilerOptions": {
+    "allowImportingTsExtensions": true,
+    "lib": ["es2018"],
+    "target": "es2020"
+  }
+}

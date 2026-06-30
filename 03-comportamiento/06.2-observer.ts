@@ -24,37 +24,47 @@ interface Observer {
 // Clase Subject - WeatherStation
 // TODO: Terminal la implementación
 class WeatherStation {
-  // observers = [];
-  // weatherData = 'Soleado';
+  private observers: Observer[] = [];
+  private weatherData: string = 'Soleado';
 
   // Agregar un Observer
   subscribe(observer: Observer): void {
-    // TODO: añadir observer
-
-    console.log(
-      '%cNueva aplicación suscrita al sistema meteorológico.',
-      COLORS.green
-    );
+    // Evitar suscripciones duplicadas
+    if (this.observers.indexOf(observer) === -1) {
+      this.observers.push(observer);
+      console.log('%cNueva aplicación suscrita al sistema meteorológico.', COLORS.green);
+    } else {
+      console.log('%cLa aplicación ya está suscrita.', COLORS.yellow);
+    }
   }
 
   // Eliminar un Observer
   unsubscribe(observer: Observer): void {
-    // TODO: eliminar observer
-
-    console.log(`%cUna aplicación se ha dado de baja`, COLORS.red);
+    const initialLength = this.observers.length;
+    this.observers = this.observers.filter((obs) => obs !== observer);
+    if (this.observers.length < initialLength) {
+      console.log(`%cUna aplicación se ha dado de baja`, COLORS.red);
+    } else {
+      console.log(`%cNo se encontró la aplicación entre los suscriptores`, COLORS.yellow);
+    }
   }
 
   // Actualizar el clima y notificar a todos los Observers
   setWeather(weatherData: string): void {
+    this.weatherData = weatherData;
     console.log(`\nClima actualizado: %c${weatherData}`, COLORS.blue);
-
-    // TODO: actualizar clima y notificar a todos los Observers con el método notifyObservers
+    this.notifyObservers();
   }
 
   // Notificar a todos los Observers
   private notifyObservers(): void {
-    // TODO: implementar método
-    throw new Error('Method not implemented.');
+    for (const observer of this.observers) {
+      try {
+        observer.update(this.weatherData);
+      } catch (err) {
+        console.error('Error notificando observer:', err);
+      }
+    }
   }
 }
 
